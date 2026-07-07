@@ -1,65 +1,67 @@
 <template>
-  <div style="padding:20px">
+  <div class="container">
     <h1>健康管理系统</h1>
+    <p class="welcome">
+  欢迎使用个人健康管理系统，记录健康生活每一天！
+</p>
+<HealthScore :score="healthScore" />
     <!-- 今日健康概览 -->
-<div class="summary-box">
-
-  <div class="card">
-    <h3>🏃 今日运动</h3>
-    <p>{{ totalSport }} 分钟</p>
-  </div>
-
-  <div class="card">
-    <h3>🍔 今日摄入</h3>
-    <p>{{ totalCal }} kcal</p>
-  </div>
-
-  <div class="card">
-    <h3>🎯 剩余建议</h3>
-    <p>{{ 2000 - totalCal }} kcal</p>
-  </div>
-
-</div>
+<SummaryCard
+  :sport="totalSport"
+  :cal="totalCal"
+/>
 
     <!-- 🏃 运动模块 -->
-    <h2>运动记录</h2>
+    <SportRecord
+  :list="sportList"
 
-    <input v-model="sportType" placeholder="运动类型（如跑步）" />
-    <input v-model="sportTime" placeholder="时间（分钟）" />
-    <button @click="addSport">添加运动</button>
+  :sportDate="sportDate"
 
-    <ul>
-  <li v-for="(item, index) in sportList" :key="index">
+  :sportType="sportType"
 
-    {{ item.type }} - {{ item.time }} 分钟
+  :sportTime="sportTime"
 
-    <button @click="deleteSport(index)">
-      删除
-    </button>
 
-  </li>
-</ul>
+  @update:sportDate="sportDate=$event"
+
+  @update:sportType="sportType=$event"
+
+  @update:sportTime="sportTime=$event"
+
+
+  @add="addSport"
+
+  @delete="deleteSport"
+/>
 
     <hr />
 
     <!-- 🍔 饮食模块 -->
-    <h2>饮食记录</h2>
+    <FoodRecord
 
-    <input v-model="foodName" placeholder="食物名称" />
-    <input v-model="foodCal" placeholder="卡路里（kcal）" />
-    <button @click="addFood">添加饮食</button>
+  :list="foodList"
 
-    <ul>
-  <li v-for="(item, index) in foodList" :key="index">
+  :foodDate="foodDate"
 
-    {{ item.name }} - {{ item.cal }} kcal
+  :foodName="foodName"
 
-    <button @click="deleteFood(index)">
-      删除
-    </button>
+  :foodCal="foodCal"
 
-  </li>
-</ul>
+
+
+  @update:foodDate="foodDate=$event"
+
+  @update:foodName="foodName=$event"
+
+  @update:foodCal="foodCal=$event"
+
+
+
+  @add="addFood"
+
+  @delete="deleteFood"
+
+/>
 
     <hr />
 <!-- 📈 健康数据分析 -->
@@ -67,48 +69,64 @@
 <!-- 🔔 健康提醒 -->
 <h2>健康提醒</h2>
 
-<div class="notice-box">
+<HealthNotice 
+  :sport="totalSport"
+  :cal="totalCal"
+/>
+<HealthChart
 
-  <p>💧 今天记得多喝水</p>
+  :dates="chartDates"
 
-  <p>🏃 今天运动目标完成了吗？</p>
+  :sport="sportData"
 
-  <p>🌙 保持规律作息</p>
+  :food="foodData"
+
+/>
+
+
+<footer>
+  © 2026 个人健康管理系统 | 武汉大学课程设计
+</footer>
 
 </div>
-
-<div id="healthChart" style="width:100%;height:400px;"></div>
-    <!-- 📊 统计模块 -->
-    <h2>今日统计</h2>
-
-    <p>总运动时间：{{ totalSport }} 分钟</p>
-    <p>总摄入卡路里：{{ totalCal }} kcal</p>
-  </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import * as echarts from 'echarts'
+import { ref, computed, watch } from 'vue'
+
+import HealthScore from './components/HealthScore.vue'
+import HealthNotice from './components/HealthNotice.vue'
+import SummaryCard from './components/SummaryCard.vue'
+import SportRecord from './components/SportRecord.vue'
+import FoodRecord from './components/FoodRecord.vue'
+import HealthChart from './components/HealthChart.vue'
 
 /* ===== 运动数据 ===== */
+const sportDate = ref('')
+
 const sportType = ref('')
+
 const sportTime = ref('')
-const sportList = ref([])
+const sportList = ref(
+  JSON.parse(localStorage.getItem('sportList')) || []
+)
 
 /* 添加运动 */
 function addSport() {
-  if (!sportType.value || !sportTime.value) {
+  if (!sportDate.value || !sportType.value || !sportTime.value) {
     alert('请填写完整运动信息')
     return
   }
 
   sportList.value.push({
-    type: sportType.value,
-    time: Number(sportTime.value)
-  })
+  date: sportDate.value,
+  type: sportType.value,
+  time: Number(sportTime.value)
+})
 
-  sportType.value = ''
-  sportTime.value = ''
+  sportDate.value = ''
+sportType.value = ''
+sportTime.value = ''
 }
 
 function deleteSport(index){
@@ -117,24 +135,31 @@ function deleteSport(index){
 
 }
 /* ===== 饮食数据 ===== */
+const foodDate = ref('')
+
 const foodName = ref('')
+
 const foodCal = ref('')
-const foodList = ref([])
+const foodList = ref(
+  JSON.parse(localStorage.getItem('foodList')) || []
+)
 
 /* 添加饮食 */
 function addFood() {
-  if (!foodName.value || !foodCal.value) {
+ if (!foodDate.value || !foodName.value || !foodCal.value)  {
     alert('请填写完整饮食信息')
     return
   }
 
   foodList.value.push({
-    name: foodName.value,
-    cal: Number(foodCal.value)
-  })
+  date: foodDate.value,
+  name: foodName.value,
+  cal: Number(foodCal.value)
+})
 
-  foodName.value = ''
-  foodCal.value = ''
+  foodDate.value = ''
+foodName.value = ''
+foodCal.value = ''
 }
 function deleteFood(index){
 
@@ -150,70 +175,88 @@ const totalSport = computed(() => {
 const totalCal = computed(() => {
   return foodList.value.reduce((sum, item) => sum + item.cal, 0)
 })
-let chart
+const healthScore = computed(() => {
 
+  let score = 100
 
-onMounted(()=>{
+  // 运动不足扣分
+  if(totalSport.value < 30){
+    score -= 20
+  }
 
-  chart = echarts.init(
-    document.getElementById('healthChart')
-  )
+  // 热量过高扣分
+  if(totalCal.value > 2000){
+    score -= 20
+  }
 
+  // 防止出现负数
+  if(score < 0){
+    score = 0
+  }
 
-  updateChart()
+  return score
 
+})
+const chartDates = computed(() => {
+  const dates = [
+    ...sportList.value.map(item => item.date),
+    ...foodList.value.map(item => item.date)
+  ]
+
+  return [...new Set(dates)].sort()
+})
+
+const sportData = computed(() => {
+  return chartDates.value.map(date => {
+    return sportList.value
+      .filter(item => item.date === date)
+      .reduce((sum, item) => sum + item.time, 0)
+  })
+})
+
+const foodData = computed(() => {
+  return chartDates.value.map(date => {
+    return foodList.value
+      .filter(item => item.date === date)
+      .reduce((sum, item) => sum + item.cal, 0)
+  })
 })
 
 
-function updateChart(){
 
-  chart.setOption({
-
-    title:{
-      text:'健康数据趋势'
-    },
-
-    tooltip:{},
-
-    xAxis:{
-      type:'category',
-      data:['今日']
-    },
-
-    yAxis:{
-      type:'value'
-    },
-
-    series:[
-
-      {
-        name:'运动分钟',
-        type:'line',
-        data:[totalSport.value]
-      },
-
-      {
-        name:'摄入热量',
-        type:'bar',
-        data:[totalCal.value]
-      }
-
-    ]
-
-  })
-
-}
-
+  {
+    deep:true
+  }
 
 watch(
-  [totalSport,totalCal],
-  ()=>{
-    updateChart()
-  }
+  sportList,
+  () => {
+    localStorage.setItem(
+      'sportList',
+      JSON.stringify(sportList.value)
+    )
+  },
+  { deep: true }
+)
+
+watch(
+  foodList,
+  () => {
+    localStorage.setItem(
+      'foodList',
+      JSON.stringify(foodList.value)
+    )
+  },
+  { deep: true }
 )
 </script>
 
 <style>
+.container{
+    max-width:1100px;
+    margin:0 auto;
+    padding:30px;
+}
 body {
   margin: 0;
   background: #f5f7fb;
@@ -286,42 +329,22 @@ p {
   font-weight: bold;
 }
 
-.summary-box{
-    display:flex;
-    gap:20px;
-    margin-bottom:30px;
-}
 
-.card{
-    flex:1;
-    background:white;
-    padding:20px;
-    border-radius:12px;
+
+
+
+.welcome{
     text-align:center;
-    box-shadow:0 3px 10px rgba(0,0,0,.08);
+    color:#666;
+    margin-top:-15px;
+    margin-bottom:25px;
 }
 
-.card h3{
-    color:#409EFF;
+footer{
+    text-align:center;
+    color:#999;
+    margin-top:40px;
+    font-size:14px;
 }
 
-.card p{
-    font-size:26px;
-    color:#ff6b6b;
-}
-.notice-box{
-
-  background:white;
-  padding:20px;
-  border-radius:12px;
-  box-shadow:0 3px 10px rgba(0,0,0,.08);
-
-}
-
-.notice-box p{
-
-  margin:15px 0;
-  font-size:18px;
-
-}
 </style>
