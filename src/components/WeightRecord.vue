@@ -2,69 +2,51 @@
 
   <div>
 
-    <h2>运动记录</h2>
+    <h2>⚖️ 体重记录</h2>
 
-
-    <input 
-      :value="sportDate"
+    <input
+      :value="weightDate"
       type="date"
-      @input="$emit('update:sportDate',$event.target.value)"
+      @input="$emit('update:weightDate',$event.target.value)"
     />
 
-    <input 
-      :value="sportType"
-      placeholder="运动类型（如跑步）"
-      @input="$emit('update:sportType',$event.target.value)"
+    <input
+      :value="weight"
+      placeholder="请输入体重（kg）"
+      @input="$emit('update:weight',$event.target.value)"
     />
-
-
-    <input 
-      :value="sportTime"
-      placeholder="时间（分钟）"
-      @input="$emit('update:sportTime',$event.target.value)"
-    />
-
 
     <button @click="$emit('add')">
-      添加运动
+      添加体重
     </button>
-
-
 
     <ul>
 
-      <li 
+      <li
         v-for="(item,index) in list"
         :key="index"
       >
 
-        <div>📅 {{ item.recordDate }}</div>
+        <div>📅 {{ item.date }}</div>
 
-<div>🏃 {{ item.sportType }}</div>
+        <div>⚖️ {{ item.weight }} kg</div>
 
-<div>⏱ {{ item.duration }} 分钟</div>
-
-        <button 
+        <button
           class="delete-btn"
           @click="$emit('delete',item.id)"
         >
           🗑 删除
         </button>
 
-
       </li>
 
     </ul>
 
-
   </div>
-
 
 </template>
 
-
 <script setup>
-
 
 defineProps({
 
@@ -73,23 +55,17 @@ defineProps({
     default:()=>[]
   },
 
-  sportDate:String,
+  weightDate:String,
 
-  sportType:String,
-
-  sportTime:String
-
+  weight:String
 
 })
 
-
 defineEmits([
 
-  'update:sportDate',
+  'update:weightDate',
 
-  'update:sportType',
-
-  'update:sportTime',
+  'update:weight',
 
   'add',
 
@@ -97,13 +73,9 @@ defineEmits([
 
 ])
 
-
 </script>
 
-
-
 <style scoped>
-
 
 input{
 
@@ -112,7 +84,6 @@ input{
   margin:8px;
 
 }
-
 
 button{
 
@@ -124,27 +95,20 @@ button{
 
 }
 
-
 li{
 
   margin:8px 0;
-
   background:white;
-
   padding:10px;
-
   border-radius:6px;
 
 }
 
-
 .delete-btn{
 
   background:#f56c6c;
-
   margin-top:8px;
 
 }
-
 
 </style>
