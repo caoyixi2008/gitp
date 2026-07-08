@@ -14,6 +14,10 @@ public interface DietRecordMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(DietRecord record);
 
+    // 根据 id 和 userId 删除饮食记录
+    @Delete("DELETE FROM diet_record WHERE id = #{id} AND user_id = #{userId}")
+    int deleteById(@Param("id") Integer id, @Param("userId") Integer userId);
+    
     // 查询用户某天的饮食记录
     @Select("SELECT * FROM diet_record WHERE user_id = #{userId} AND record_date = #{date}")
     List<DietRecord> findByUserIdAndDate(@Param("userId") Integer userId, @Param("date") LocalDate date);

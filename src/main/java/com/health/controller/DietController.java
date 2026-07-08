@@ -30,7 +30,16 @@ public class DietController {
         }
         return result;
     }
-
+    // 删除饮食记录
+    @DeleteMapping("/delete")
+    public Map<String, Object> deleteDietRecord(@RequestParam Integer id,
+                                                @RequestParam Integer userId) {
+        Map<String, Object> result = new HashMap<>();
+        boolean success = dietRecordService.deleteDietRecord(id, userId);
+        result.put("code", success ? 0 : -1);
+        result.put("message", success ? "删除成功" : "删除失败（记录不存在或无权删除）");
+        return result;
+    }
     // 查询某天饮食记录
     @GetMapping("/list")
     public Map<String, Object> getDietRecords(@RequestParam Integer userId,

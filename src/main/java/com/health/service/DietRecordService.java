@@ -19,7 +19,10 @@ public class DietRecordService {
     public boolean addDietRecord(DietRecord record) {
         return dietRecordMapper.insert(record) > 0;
     }
-
+    // 删除饮食记录（仅当记录属于该用户时才能删）
+    public boolean deleteDietRecord(Integer id, Integer userId) {
+        return dietRecordMapper.deleteById(id, userId) > 0;
+    }
     // 查询某天的饮食记录
     public List<DietRecord> getRecordsByDate(Integer userId, LocalDate date) {
         return dietRecordMapper.findByUserIdAndDate(userId, date);
