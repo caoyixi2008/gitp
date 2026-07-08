@@ -1,0 +1,28 @@
+# Java编译产物
+target/
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+
+# 配置文件（含敏感信息）
+application-dev.properties
+application-prod.properties
+*.secret.*
+!application-example.properties   # 可以上传一个示例文件
+
+# 日志
+*.log
+
+# 本地数据（防止误传）
+*.db
+*.sqlite
+*.mdb
+*.accdb
+
+# 系统文件
+.DS_Store
+Thumbs.db
