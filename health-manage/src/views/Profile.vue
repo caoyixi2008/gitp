@@ -7,8 +7,8 @@
         <input type="text" v-model="form.username" disabled />
       </div>
       <div class="form-group">
-        <label>邮箱</label>
-        <input type="email" v-model="form.email" />
+        <label>昵称</label>
+        <input type="text" v-model="form.nickname" />
       </div>
       <div class="form-group">
         <label>年龄</label>
@@ -30,37 +30,73 @@
         </select>
       </div>
       <button @click="handleSave" class="save-btn">保存修改</button>
+      <p v-if="message" class="message">{{ message }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, onMounted } from 'vue'
-import axios from 'axios'
+import { reactive, onMounted, ref } from 'vue'
+import request from '../utils/request'
 
 const form = reactive({
   username: '',
-  email: '',
+  nickname: '',
   age: '',
   height: '',
   weight: '',
   gender: 'MALE'
 })
+const message = ref('')
 
-// 加载用户数据（模拟，等后端好了再改）
-const loadUserInfo = () => {
-  // 模拟数据
-  const savedUsername = localStorage.getItem('username') || 'admin'
-  form.username = savedUsername
-  form.email = 'admin@test.com'
-  form.age = 25
-  form.height = 170
-  form.weight = 65
-  form.gender = 'MALE'
+const loadUserInfo = async () => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    message.value = '请先登录'
+    return
+  }
+
+  try {
+    const res = await request.get('/user/profile')
+    if (res.data.code === 200) {
+      const data = res.data.data
+      form.username = data.username || ''
+      form.nickname = data.nickname || ''
+      form.age = data.age || ''
+      form.height = data.height || ''
+      form.weight = data.weight || ''
+      form.gender = data.gender || 'MALE'
+    } else {
+      message.value = res.data.message || '加载失败'
+    }
+  } catch (error) {
+    message.value = '网络错误，请检查后端是否启动'
+  }
 }
 
-const handleSave = () => {
-  alert('保存成功！（模拟，等后端接口好了再真实保存）')
+const handleSave = async () => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    message.value = '请先登录'
+    return
+  }
+
+  try {
+    const res = await request.put('/user/profile', {
+      nickname: form.nickname,
+      age: Number(form.age),
+      gender: form.gender,
+      height: Number(form.height),
+      weight: Number(form.weight)
+    })
+    if (res.data.code === 200) {
+      message.value = '✅ 保存成功！'
+    } else {
+      message.value = res.data.message || '保存失败'
+    }
+  } catch (error) {
+    message.value = '网络错误，请检查后端是否启动'
+  }
 }
 
 onMounted(() => {
@@ -119,5 +155,10 @@ onMounted(() => {
 }
 .save-btn:hover {
   background: #5a6fd6;
+}
+.message {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #333;
 }
 </style>

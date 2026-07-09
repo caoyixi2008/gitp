@@ -7,16 +7,18 @@
       <input type="password" v-model="form.password" placeholder="请输入密码" />
       <button @click="handleLogin">登录</button>
       <router-link to="/register">去注册</router-link>
+      <p v-if="errorMsg" style="color:red;font-size:14px;">{{ errorMsg }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 
 const router = useRouter()
+const errorMsg = ref('')
 
 const form = reactive({
   username: '',
@@ -24,44 +26,27 @@ const form = reactive({
 })
 
 const handleLogin = async () => {
-  // 表单校验
   if (!form.username || !form.password) {
-    alert('请输入用户名和密码')
+    errorMsg.value = '请输入用户名和密码'
     return
   }
 
-  // 暂时使用模拟登录（等后端接口好了再切换到真实请求）
-  // ===== 模拟登录开始（等后端接口好了就删掉这段）=====
-  if (form.username === 'admin' && form.password === '123456') {
-    localStorage.setItem('token', 'mock-token-xxx')
-    localStorage.setItem('username', form.username)
-    alert('登录成功！')
-    router.push('/home')
-    return
-  } else {
-    alert('用户名或密码错误！')
-    return
-  }
-  // ===== 模拟登录结束 =====
-
-  // 真实后端请求（等后端接口好了，把上面的模拟登录删掉，取消下面代码的注释）
-  /*
   try {
-    const res = await axios.post('/api/user/login', {
+    const res = await axios.post('http://localhost:8081/api/auth/login', {
       username: form.username,
       password: form.password
     })
-    if (res.data.code === 200 && res.data.data.token) {
+    if (res.data.code === 200) {
       localStorage.setItem('token', res.data.data.token)
       localStorage.setItem('username', form.username)
+      alert('登录成功！')
       router.push('/home')
     } else {
-      alert(res.data.msg || '登录失败')
+      errorMsg.value = res.data.message || '登录失败'
     }
   } catch (error) {
-    alert('网络错误，请重试')
+    errorMsg.value = '网络错误，请检查后端是否启动'
   }
-  */
 }
 </script>
 

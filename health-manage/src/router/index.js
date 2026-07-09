@@ -3,39 +3,27 @@ import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import Home from '../views/Home.vue'
 import Profile from '../views/Profile.vue'
-import Target from '../views/Target.vue'   // ← 新增这行
+import Target from '../views/Target.vue'
+import Sport from '../views/Sport.vue'
+import Food from '../views/Food.vue'
+import Notice from '../views/Notice.vue'
+import Report from '../views/Report.vue'
 
 const routes = [
-  {
-    path: '/',
-    redirect: '/login'
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: Login
-  },
-  {
-    path: '/register',
-    name: 'Register',
-    component: Register
-  },
+  { path: '/', redirect: '/login' },
+  { path: '/login', name: 'Login', component: Login },
+  { path: '/register', name: 'Register', component: Register },
   {
     path: '/home',
     name: 'Home',
     component: Home,
-    redirect: '/profile',
     children: [
-      {
-        path: '/profile',
-        name: 'Profile',
-        component: Profile
-      },
-      {   // ← 新增这个对象
-        path: '/target',
-        name: 'Target',
-        component: Target
-      }
+      { path: '/profile', name: 'Profile', component: Profile },
+      { path: '/target', name: 'Target', component: Target },
+      { path: '/sport', name: 'Sport', component: Sport },
+      { path: '/diet', name: 'Diet', component: Food },
+      { path: '/notice', name: 'Notice', component: Notice },
+      { path: '/report', name: 'Report', component: Report }
     ]
   }
 ]

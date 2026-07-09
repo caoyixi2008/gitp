@@ -6,227 +6,170 @@
     <div class="add-target">
       <h3>设定新目标</h3>
       <div class="form-row">
-        <select v-model="newTarget.type">
+        <select v-model="newTarget.goalType">
           <option value="">请选择目标类型</option>
-          <option value="WEIGHT">体重目标</option>
-          <option value="EXERCISE">每周运动次数</option>
-          <option value="STEPS">每日步数</option>
+          <option value="weight_loss">减重</option>
+          <option value="weight_gain">增重</option>
+          <option value="exercise">运动</option>
+          <option value="diet">饮食</option>
+          <option value="sleep">睡眠</option>
         </select>
-        <input type="number" v-model="newTarget.value" placeholder="目标值" />
-        <input type="date" v-model="newTarget.deadline" />
-        <button @click="addTarget">添加目标</button>
+        <input type="text" v-model="newTarget.title" placeholder="目标标题" />
+        <input type="number" v-model="newTarget.targetValue" placeholder="目标值" />
+        <input type="text" v-model="newTarget.unit" placeholder="单位 (如 kg, 分钟)" />
+        <input type="date" v-model="newTarget.startDate" placeholder="开始日期" />
+        <input type="date" v-model="newTarget.endDate" placeholder="结束日期" />
+        <button @click="addGoal">添加目标</button>
       </div>
     </div>
 
     <!-- 目标列表 -->
     <div class="target-list">
       <h3>我的目标</h3>
-      <div v-for="item in targets" :key="item.id" class="target-card">
-        <div class="target-info">
-          <span class="target-type">{{ item.type }}</span>
-          <span class="target-value">目标：{{ item.value }}</span>
-          <span class="target-current">当前：{{ item.current }}</span>
-          <span class="target-deadline">截止：{{ item.deadline }}</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" :style="{ width: item.progress + '%' }"></div>
-          <span class="progress-text">{{ item.progress }}%</span>
-        </div>
-        <button @click="deleteTarget(item.id)" class="delete-btn">删除</button>
-      </div>
-      <div v-if="targets.length === 0" class="empty-tip">暂无目标，赶快设定一个吧！</div>
+      <ul>
+        <li v-for="goal in goals" :key="goal.id">
+          <strong>{{ goal.title }}</strong>
+          <span>类型: {{ goal.goalType }}</span>
+          <span>目标值: {{ goal.targetValue }} {{ goal.unit }}</span>
+          <span>当前进度: {{ goal.currentValue || 0 }} {{ goal.unit }}</span>
+          <span>状态: {{ goal.status || '进行中' }}</span>
+          <button @click="deleteGoal(goal.id)">删除</button>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
-import axios from 'axios'
+import { ref, reactive, onMounted } from 'vue'
+import request from '../utils/request'
 
-// 目标列表
-const targets = ref([])
-
-// 新目标表单
+const goals = ref([])
 const newTarget = reactive({
-  type: '',
-  value: '',
-  deadline: ''
+  title: '',
+  goalType: '',
+  targetValue: '',
+  unit: '',
+  startDate: '',
+  endDate: ''
 })
 
-// 加载目标列表
-const loadTargets = async () => {
+const loadGoals = async () => {
   try {
-    const res = await axios.get('/api/goal/list')
-    if (res.data.code === 0) {
-      targets.value = res.data.data || []
-    } else {
-      alert(res.data.msg || '加载目标列表失败')
-    }
-  } catch (error) {
-    alert('网络错误，请确认后端已启动')
+    const res = await request.get('/goal/list')
+    goals.value = res.data.data || []
+  } catch (e) {
+    console.error('加载目标失败', e)
   }
 }
 
-// 添加目标
-const addTarget = async () => {
-  if (!newTarget.type || !newTarget.value || !newTarget.deadline) {
-    alert('请完整填写目标信息')
+const addGoal = async () => {
+  if (!newTarget.title || !newTarget.goalType || !newTarget.targetValue || !newTarget.unit) {
+    alert('请填写完整的目标信息（标题、类型、目标值、单位）')
     return
   }
 
   try {
-    const res = await axios.post('/api/goal', {
-      targetType: newTarget.type,
-      targetValue: newTarget.value,
-      deadline: newTarget.deadline
+    const res = await request.post('/goal', {
+      title: newTarget.title,
+      goalType: newTarget.goalType,
+      targetValue: Number(newTarget.targetValue),
+      unit: newTarget.unit,
+      startDate: newTarget.startDate || null,
+      endDate: newTarget.endDate || null
     })
-    if (res.data.code === 0) {
-      alert('目标添加成功')
-      newTarget.type = ''
-      newTarget.value = ''
-      newTarget.deadline = ''
-      loadTargets()
+    if (res.data.code === 200) {
+      alert('目标添加成功！')
+      newTarget.title = ''
+      newTarget.goalType = ''
+      newTarget.targetValue = ''
+      newTarget.unit = ''
+      newTarget.startDate = ''
+      newTarget.endDate = ''
+      loadGoals()
     } else {
-      alert(res.data.msg || '添加失败')
+      alert(res.data.message || '添加失败')
     }
-  } catch (error) {
-    alert('网络错误，请确认后端已启动')
+  } catch (e) {
+    alert('网络错误，请检查后端是否启动')
   }
 }
 
-// 删除目标
-const deleteTarget = async (id) => {
+const deleteGoal = async (id) => {
   if (!confirm('确定要删除这个目标吗？')) return
-
   try {
-    const res = await axios.delete(`/api/goal/${id}`)
-    if (res.data.code === 0) {
+    const res = await request.delete(`/goal/${id}`)
+    if (res.data.code === 200) {
       alert('删除成功')
-      loadTargets()
+      loadGoals()
     } else {
-      alert(res.data.msg || '删除失败')
+      alert(res.data.message || '删除失败')
     }
-  } catch (error) {
-    alert('网络错误，请确认后端已启动')
+  } catch (e) {
+    alert('网络错误')
   }
 }
 
 onMounted(() => {
-  loadTargets()
+  loadGoals()
 })
 </script>
 
 <style scoped>
-.target-page h2 {
-  margin-bottom: 20px;
-  color: #333;
+.target-page {
+  padding: 20px;
 }
 .add-target {
   background: white;
-  padding: 20px 24px;
+  padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  margin-bottom: 24px;
-}
-.add-target h3 {
-  margin-bottom: 12px;
-  font-size: 16px;
-  color: #555;
+  margin-bottom: 20px;
 }
 .form-row {
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
 }
-.form-row select,
-.form-row input {
-  padding: 10px 14px;
+.form-row input,
+.form-row select {
+  padding: 8px 12px;
   border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-  flex: 1;
-  min-width: 120px;
-}
-.form-row select:focus,
-.form-row input:focus {
-  outline: none;
-  border-color: #667eea;
+  border-radius: 6px;
 }
 .form-row button {
-  padding: 10px 24px;
+  padding: 8px 20px;
   background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-}
-.form-row button:hover {
-  background: #5a6fd6;
-}
-.target-list h3 {
-  margin-bottom: 12px;
-  font-size: 16px;
-  color: #555;
-}
-.target-card {
-  background: white;
-  padding: 16px 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  margin-bottom: 12px;
-}
-.target-info {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  font-size: 14px;
-  color: #555;
-  margin-bottom: 10px;
-}
-.target-type {
-  font-weight: 600;
-  color: #333;
-}
-.progress-bar {
-  height: 24px;
-  background: #e9ecef;
-  border-radius: 12px;
-  position: relative;
-  overflow: hidden;
-}
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  border-radius: 12px;
-  transition: width 0.3s;
-}
-.progress-text {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 12px;
-  font-weight: 600;
-  color: #333;
-}
-.delete-btn {
-  margin-top: 10px;
-  padding: 6px 16px;
-  background: #dc3545;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
 }
-.delete-btn:hover {
-  background: #c82333;
+.target-list ul {
+  list-style: none;
+  padding: 0;
 }
-.empty-tip {
-  text-align: center;
-  padding: 40px 0;
-  color: #999;
-  font-size: 16px;
+.target-list li {
+  background: white;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.target-list li strong {
+  min-width: 80px;
+}
+.target-list li button {
+  margin-left: auto;
+  padding: 4px 12px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 </style>
