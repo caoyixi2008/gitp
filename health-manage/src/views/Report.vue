@@ -3,6 +3,7 @@
     <h2>📊 健康报表</h2>
 
     <div class="filter-row">
+      <label>选择日期：</label>
       <input type="date" v-model="selectedDate" @change="loadReport" />
     </div>
 
@@ -23,21 +24,23 @@
       </div>
     </div>
 
+    <!-- 运动记录 -->
     <div class="section">
-      <h3>🏃 运动记录</h3>
+      <h3>🏃 运动记录（{{ selectedDate }}）</h3>
       <ul>
         <li v-for="item in sportList" :key="item.id">
-          {{ item.sportType }} - {{ item.duration }} 分钟 - 🔥 {{ item.calories }} 千卡 - {{ item.recordDate }}
+          {{ item.sportType }} - {{ item.duration }} 分钟 - 🔥 {{ item.calories }} 千卡
         </li>
         <li v-if="sportList.length === 0">暂无运动记录</li>
       </ul>
     </div>
 
+    <!-- 饮食记录 -->
     <div class="section">
-      <h3>🍔 饮食记录</h3>
+      <h3>🍔 饮食记录（{{ selectedDate }}）</h3>
       <ul>
         <li v-for="item in dietList" :key="item.id">
-          {{ item.foodName }} - {{ item.calories }} 千卡 - {{ item.mealType }} - {{ item.recordDate }}
+          {{ item.foodName }} - {{ item.calories }} 千卡 - {{ item.mealType }}
         </li>
         <li v-if="dietList.length === 0">暂无饮食记录</li>
       </ul>
@@ -94,7 +97,7 @@ onMounted(() => {
 
 <style scoped>
 .report-page { padding: 20px; max-width: 800px; margin: 0 auto; }
-.filter-row { margin-bottom: 20px; }
+.filter-row { margin-bottom: 20px; display: flex; gap: 12px; align-items: center; }
 .filter-row input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; }
 .summary-cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
 .summary-cards .card { background: white; padding: 16px 24px; border-radius: 12px; flex: 1; min-width: 120px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
@@ -102,6 +105,7 @@ onMounted(() => {
 .card-value { font-size: 24px; font-weight: 700; }
 .card-value.negative { color: #e74c3c; }
 .section { background: white; padding: 16px 20px; border-radius: 12px; margin-bottom: 16px; }
+.section h3 { margin-bottom: 12px; }
 .section ul { list-style: none; padding: 0; }
 .section li { padding: 8px 0; border-bottom: 1px solid #f1f3f5; }
 </style>
