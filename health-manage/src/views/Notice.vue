@@ -1,7 +1,7 @@
 <template>
   <div class="notice-page">
     <h2>🔔 健康提醒</h2>
-    
+
     <div class="tabs">
       <button @click="filter = 'all'" :class="{ active: filter === 'all' }">全部</button>
       <button @click="filter = 'unread'" :class="{ active: filter === 'unread' }">未读</button>
@@ -62,11 +62,11 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.notice-page { padding: 20px; }
+.notice-page { padding: 20px; max-width: 800px; margin: 0 auto; }
 .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
 .tabs button { padding: 8px 20px; border: 1px solid #ddd; border-radius: 6px; background: white; cursor: pointer; }
 .tabs button.active { background: #667eea; color: white; border-color: #667eea; }
-.notice-item { background: white; padding: 16px 20px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.notice-item { background: white; padding: 16px 20px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
 .notice-item.unread { border-left: 4px solid #667eea; }
 .notice-title { font-weight: 600; margin-bottom: 4px; }
 .notice-body { color: #555; font-size: 14px; margin-bottom: 6px; }

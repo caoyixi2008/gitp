@@ -15,7 +15,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import request from '../utils/request'
 
 const router = useRouter()
 const errorMsg = ref('')
@@ -32,7 +32,7 @@ const handleLogin = async () => {
   }
 
   try {
-    const res = await axios.post('http://localhost:8081/api/auth/login', {
+    const res = await request.post('/auth/login', {
       username: form.username,
       password: form.password
     })
@@ -45,7 +45,7 @@ const handleLogin = async () => {
       errorMsg.value = res.data.message || '登录失败'
     }
   } catch (error) {
-    errorMsg.value = '网络错误，请检查后端是否启动'
+    errorMsg.value = '网络错误'
   }
 }
 </script>

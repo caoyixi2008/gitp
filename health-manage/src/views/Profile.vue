@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-import { reactive, onMounted, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import request from '../utils/request'
 
 const form = reactive({
@@ -50,12 +50,6 @@ const form = reactive({
 const message = ref('')
 
 const loadUserInfo = async () => {
-  const token = localStorage.getItem('token')
-  if (!token) {
-    message.value = '请先登录'
-    return
-  }
-
   try {
     const res = await request.get('/user/profile')
     if (res.data.code === 200) {
@@ -66,21 +60,13 @@ const loadUserInfo = async () => {
       form.height = data.height || ''
       form.weight = data.weight || ''
       form.gender = data.gender || 'MALE'
-    } else {
-      message.value = res.data.message || '加载失败'
     }
-  } catch (error) {
-    message.value = '网络错误，请检查后端是否启动'
+  } catch (e) {
+    message.value = '加载失败'
   }
 }
 
 const handleSave = async () => {
-  const token = localStorage.getItem('token')
-  if (!token) {
-    message.value = '请先登录'
-    return
-  }
-
   try {
     const res = await request.put('/user/profile', {
       nickname: form.nickname,
@@ -94,8 +80,8 @@ const handleSave = async () => {
     } else {
       message.value = res.data.message || '保存失败'
     }
-  } catch (error) {
-    message.value = '网络错误，请检查后端是否启动'
+  } catch (e) {
+    message.value = '网络错误'
   }
 }
 
@@ -105,60 +91,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.profile-page h2 {
-  margin-bottom: 20px;
-  color: #333;
-}
-.profile-card {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  max-width: 500px;
-}
-.form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 16px;
-}
-.form-group label {
-  font-weight: 600;
-  margin-bottom: 4px;
-  font-size: 14px;
-  color: #555;
-}
-.form-group input,
-.form-group select {
-  padding: 10px 14px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-}
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #667eea;
-}
-.form-group input:disabled {
-  background: #f1f3f5;
-  color: #888;
-}
-.save-btn {
-  padding: 12px 30px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-top: 8px;
-}
-.save-btn:hover {
-  background: #5a6fd6;
-}
-.message {
-  margin-top: 12px;
-  font-size: 14px;
-  color: #333;
-}
+.profile-page { padding: 20px; max-width: 600px; margin: 0 auto; }
+.profile-card { background: white; padding: 24px 30px; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.form-group { display: flex; flex-direction: column; margin-bottom: 14px; }
+.form-group label { font-weight: 600; font-size: 14px; color: #555; margin-bottom: 4px; }
+.form-group input, .form-group select { padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+.form-group input:disabled { background: #f1f3f5; color: #888; }
+.save-btn { padding: 10px 30px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; }
+.save-btn:hover { background: #5a6fd6; }
+.message { margin-top: 10px; font-size: 14px; color: #333; }
 </style>

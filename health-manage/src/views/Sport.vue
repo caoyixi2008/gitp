@@ -1,12 +1,11 @@
 <template>
   <div class="sport-page">
     <h2>🏃 运动记录</h2>
-    
+
     <!-- 添加运动表单 -->
     <div class="add-form">
       <h3>记录运动</h3>
       <div class="form-row">
-        <!-- 预设运动选择 -->
         <select v-model="newSport.sportType" @change="onSportTypeChange">
           <option value="">选择运动类型</option>
           <option value="跑步">跑步</option>
@@ -21,27 +20,25 @@
           <option value="快走">快走</option>
           <option value="自定义">✏️ 自定义</option>
         </select>
-        
-        <!-- 自定义运动名称输入框 -->
-        <input v-if="newSport.sportType === '自定义'" 
-               v-model="newSport.customSportName" 
-               placeholder="输入运动名称" 
+
+        <input v-if="newSport.sportType === '自定义'"
+               v-model="newSport.customSportName"
+               placeholder="输入运动名称"
                class="custom-input" />
-        
+
         <input type="number" v-model="newSport.duration" placeholder="时长(分钟)" />
         <input type="date" v-model="newSport.recordDate" />
-        
-        <!-- 自定义消耗系数（仅自定义模式显示） -->
-        <input v-if="newSport.sportType === '自定义'" 
-               type="number" 
-               v-model="newSport.customCaloriesPerMin" 
-               placeholder="消耗(千卡/分钟)" 
+
+        <input v-if="newSport.sportType === '自定义'"
+               type="number"
+               v-model="newSport.customCaloriesPerMin"
+               placeholder="消耗(千卡/分钟)"
                class="custom-input" />
-        
+
         <button @click="addSport">添加</button>
       </div>
       <p v-if="newSport.sportType === '自定义'" class="hint">
-        💡 提示：消耗量 = 时长 × 消耗系数
+        💡 消耗量 = 时长 × 消耗系数
       </p>
     </div>
 
@@ -85,7 +82,6 @@ const totalCalories = computed(() => {
   return sportList.value.reduce((sum, item) => sum + (item.calories || 0), 0)
 })
 
-// 预设运动的消耗系数（千卡/分钟）
 const presetCalories = {
   '跑步': 10,
   '游泳': 8,
@@ -99,13 +95,7 @@ const presetCalories = {
   '快走': 5
 }
 
-const onSportTypeChange = () => {
-  // 如果选择了预设运动，自动填入系数提示
-  if (newSport.value.sportType && newSport.value.sportType !== '自定义') {
-    const rate = presetCalories[newSport.value.sportType] || 5
-    // 只显示提示，不自动填入
-  }
-}
+const onSportTypeChange = () => {}
 
 const loadSport = async () => {
   try {
@@ -123,7 +113,6 @@ const addSport = async () => {
   let caloriesPerMin = presetCalories[sportType] || 5
   let isCustom = false
 
-  // 处理自定义运动
   if (sportType === '自定义') {
     if (!newSport.value.customSportName) {
       alert('请输入运动名称')
@@ -190,20 +179,18 @@ onMounted(() => {
 
 <style scoped>
 .sport-page { padding: 20px; max-width: 800px; margin: 0 auto; }
-.add-form { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.add-form { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
 .form-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .form-row select, .form-row input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
 .form-row select { min-width: 130px; }
 .form-row input { min-width: 100px; }
 .form-row .custom-input { min-width: 140px; }
 .form-row button { padding: 8px 24px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
-.form-row button:hover { background: #5a6fd6; }
 .hint { font-size: 12px; color: #888; margin-top: 6px; }
 .summary { background: #f0f4ff; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; font-size: 16px; }
 .record-list ul { list-style: none; padding: 0; }
-.record-list li { background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+.record-list li { background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .record-list li .sport-name { font-weight: 600; min-width: 60px; }
 .record-list li .custom-badge { font-size: 11px; background: #f0f0f0; padding: 2px 8px; border-radius: 10px; color: #666; }
 .record-list li button { margin-left: auto; padding: 4px 12px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; }
-.record-list li button:hover { background: #c0392b; }
 </style>

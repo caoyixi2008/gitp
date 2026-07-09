@@ -93,7 +93,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.report-page { padding: 20px; }
+.report-page { padding: 20px; max-width: 800px; margin: 0 auto; }
 .filter-row { margin-bottom: 20px; }
 .filter-row input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; }
 .summary-cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
