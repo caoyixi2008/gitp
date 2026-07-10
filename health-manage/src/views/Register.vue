@@ -7,7 +7,6 @@
       <input type="text" v-model="form.username" placeholder="用户名" />
       <input type="password" v-model="form.password" placeholder="密码" />
       <input type="password" v-model="form.confirmPassword" placeholder="确认密码" />
-      <input type="email" v-model="form.email" placeholder="邮箱" />
       <input type="number" v-model="form.age" placeholder="年龄" />
       <input type="number" v-model="form.height" placeholder="身高(cm)" />
       <input type="number" v-model="form.weight" placeholder="体重(kg)" />
@@ -26,7 +25,7 @@
 <script setup>
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import request from '../utils/request'
 
 const router = useRouter()
 
@@ -34,7 +33,6 @@ const form = reactive({
   username: '',
   password: '',
   confirmPassword: '',
-  email: '',
   age: '',
   height: '',
   weight: '',
@@ -42,7 +40,6 @@ const form = reactive({
 })
 
 const handleRegister = async () => {
-  // 简单校验
   if (!form.username || !form.password || !form.confirmPassword) {
     alert('请填写完整信息')
     return
@@ -56,9 +53,24 @@ const handleRegister = async () => {
     return
   }
 
-  // 模拟注册（等后端好了再替换）
-  alert('注册成功！请登录')
-  router.push('/login')
+  try {
+    const res = await request.post('/auth/register', {
+      username: form.username,
+      password: form.password,
+      age: form.age || null,
+      height: form.height || null,
+      weight: form.weight || null,
+      gender: form.gender || null
+    })
+    if (res.data.code === 200) {
+      alert('注册成功！请登录')
+      router.push('/login')
+    } else {
+      alert(res.data.message || '注册失败')
+    }
+  } catch (error) {
+    alert('网络错误，请检查后端是否启动')
+  }
 }
 </script>
 

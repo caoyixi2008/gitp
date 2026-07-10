@@ -1,13 +1,23 @@
 <template>
   <div class="login-container">
-    <h1>个人健康管理系统</h1>
     <div class="login-box">
-      <h2>登录</h2>
-      <input type="text" v-model="form.username" placeholder="请输入用户名" />
-      <input type="password" v-model="form.password" placeholder="请输入密码" />
-      <button @click="handleLogin">登录</button>
-      <router-link to="/register">去注册</router-link>
-      <p v-if="errorMsg" style="color:red;font-size:14px;">{{ errorMsg }}</p>
+      <h1>🏥 健康管理系统</h1>
+      <p class="subtitle">记录健康生活每一天</p>
+      <div class="login-form">
+        <div class="form-group">
+          <label>用户名</label>
+          <input type="text" v-model="form.username" placeholder="请输入用户名" />
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input type="password" v-model="form.password" placeholder="请输入密码" @keydown.enter="handleLogin" />
+        </div>
+        <button @click="handleLogin" class="login-btn">登 录</button>
+        <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
+        <div class="register-link">
+          还没有账号？<router-link to="/register">去注册</router-link>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -39,13 +49,12 @@ const handleLogin = async () => {
     if (res.data.code === 200) {
       localStorage.setItem('token', res.data.data.token)
       localStorage.setItem('username', form.username)
-      alert('登录成功！')
-      router.push('/home')
+      router.push('/profile')
     } else {
       errorMsg.value = res.data.message || '登录失败'
     }
   } catch (error) {
-    errorMsg.value = '网络错误'
+    errorMsg.value = '网络错误，请检查后端是否启动'
   }
 }
 </script>
@@ -54,62 +63,103 @@ const handleLogin = async () => {
 .login-container {
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
-.login-container h1 {
-  color: white;
-  font-size: 36px;
-  margin-bottom: 30px;
-}
+
 .login-box {
   background: white;
-  padding: 40px 50px;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-  width: 360px;
+  padding: 48px 44px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-box h1 {
+  text-align: center;
+  font-size: 28px;
+  color: #2d3436;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #636e72;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.login-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
-.login-box h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 10px;
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  color: #2d3436;
+  margin-bottom: 4px;
 }
-.login-box input {
+
+.form-group input {
+  width: 100%;
   padding: 12px 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
+  border: 2px solid #dfe6e9;
+  border-radius: 10px;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+  background: white;
 }
-.login-box input:focus {
+
+.form-group input:focus {
   outline: none;
   border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
 }
-.login-box button {
-  padding: 12px;
-  background: #667eea;
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 4px;
 }
-.login-box button:hover {
-  background: #5a6fd6;
+
+.login-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
 }
-.login-box a {
+
+.error-msg {
+  color: #e74c3c;
+  font-size: 14px;
   text-align: center;
-  color: #667eea;
-  text-decoration: none;
+  margin-top: -6px;
+}
+
+.register-link {
+  text-align: center;
+  color: #636e72;
   font-size: 14px;
 }
-.login-box a:hover {
+
+.register-link a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-link a:hover {
   text-decoration: underline;
 }
 </style>

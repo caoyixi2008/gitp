@@ -59,18 +59,7 @@ const newTarget = reactive({
 const loadGoals = async () => {
   try {
     const res = await request.get('/goal/list')
-    const now = new Date()
-    goals.value = (res.data.data || []).map(goal => {
-      // 根据日期强制计算状态
-      let status = '进行中'
-      if (goal.endDate && new Date(goal.endDate) < now) {
-        status = '已过期'
-      } else if (goal.startDate && new Date(goal.startDate) > now) {
-        status = '未开始'
-      }
-      goal.status = status
-      return goal
-    })
+    goals.value = res.data.data || []
   } catch (e) {
     console.error('加载目标失败', e)
   }
